@@ -1,53 +1,58 @@
 const axios = require('axios');
 
-exports.AxiosService = () => {
-    axios.defaults.baseURL = process.env.BASE_URL;
-    axios.defaults.headers.common.Accept = 'application/json, text/plain,';
-    const setHeaders = req => {
-        if (req.url !== '/login') {
-            const xAccessToken = req.headers['x-access-token'];
-            if (xAccessToken !== undefined) {
-                return {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-access-token': `${xAccessToken}`,
-                    },
-                };
+const AxiosService = (() => {
+    const AxiosInstance = axios.create({
+        baseURL: process.env.BASE_URL,
+        headers: {
+            common: {
+                Accept: 'application/json, text/plain',
+                'Content-Type': 'application/json',
             }
-        } else {
-            return {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Referer: `${req.body.email}`,
-                },
-            };
         }
+    });
+
+    const setHeaders = request => {
+        const accessToken = request.headers['x-access-token'];
+        const extraHeaders = {};
+
+        if (request.url !== '/login' && accessToken) {
+            extraHeaders['X-access-token'] = accessToken;
+        } else {
+            extraHeaders.Referer = request.body.email;
+        }
+
+        return extraHeaders;
     };
 
     const GET = (endpoint, request) => {
-        return axios.get(endpoint, setHeaders(request));
+        return AxiosInstance.get(endpoint, setHeaders(request));
     };
 
     const POST = (endpoint, data, request) => {
-        return axios.post(endpoint, data, setHeaders(request));
+        return AxiosInstance.post(endpoint, data, setHeaders(request));
     };
 
     const PUT = (endpoint, data, request) => {
-        return axios.put(endpoint, data, setHeaders(request));
+        return AxiosInstance.put(endpoint, data, setHeaders(request));
     };
 
     const PATCH = (endpoint, data, request) => {
-        return axios.patch(endpoint, data, setHeaders(request));
+        return AxiosInstance.patch(endpoint, data, setHeaders(request));
     };
 
     const DELETE = (endpoint, request) => {
-        return axios.delete(endpoint, setHeaders(request));
+        return AxiosInstance.delete(endpoint, setHeaders(request));
     };
+
     return {
-        GET,
-        POST,
-        PUT,
-        PATCH,
-        DELETE,
+        get: GET,
+        post: POST,
+        put: PUT,
+        patch: PATCH,
+        delete: DELETE,
     };
+})();
+
+exports = {
+    AxiosService,
 };
