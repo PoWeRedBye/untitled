@@ -43,10 +43,9 @@ class AxiosService {
   }
 }
 
-const DefaultAxios = new AxiosService({ baseURL: process.env.BASE_URL });
-const DataBaseAxios = new AxiosService({ baseURL: 'http://sfsdf' });
+const AxiosTheAgent = new AxiosService({ baseURL: process.env.BASE_URL });
+//const DataBaseAxios = new AxiosService({ baseURL: 'http://sfsdf' });
 
 exports = {
-  DefaultAxios,
-  DataBaseAxios,
+  AxiosTheAgent,
 };
